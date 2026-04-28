@@ -23,9 +23,11 @@ app.get("/", (req, res) => {
 
 app.post("/review", async (req, res) => {
   try {
+    console.log("Incoming request:", req.body);
+
     const { code } = req.body;
 
-    if (!code) {
+    if (!code || code.trim() === "") {
       return res.json({ result: "No code provided ❌" });
     }
 
@@ -33,30 +35,28 @@ app.post("/review", async (req, res) => {
       model: "llama-3.1-8b-instant",
       messages: [
         {
-          role: "system",
-          content: "You are a senior software engineer who reviews code.",
-        },
-        {
           role: "user",
-          content: `Review this code and provide:
-1. Bugs
-2. Improvements
-3. Fixed Code
-
-Code:
-${code}`,
+          content: `Review this code:\n${code}`,
         },
       ],
     });
 
+    console.log("Groq response:", completion);
+
+    if (!completion || !completion.choices) {
+      return res.json({ result: "Invalid AI response ❌" });
+    }
+
     res.json({
-      result: completion.choices[0].message.content,
+      result: completion.choices[0]?.message?.content || "No output",
     });
 
   } catch (err) {
-    console.log("🔥 ERROR:", err);
+    console.log("🔥 FULL ERROR:", err);
+    console.log("🔥 STACK:", err.stack);
+
     res.status(500).json({
-      result: err.message,
+      result: "Backend error: " + err.message,
     });
   }
 });
