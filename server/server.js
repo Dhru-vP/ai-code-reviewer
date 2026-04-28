@@ -67,3 +67,5 @@ const PORT = 5000;
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
 });
+
+console.log("API KEY:", process.env.GROQ_API_KEY ? "Loaded ✅" : "Missing ❌");
