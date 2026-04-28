@@ -7,28 +7,37 @@ function App() {
   const [loading, setLoading] = useState(false);
 
   const analyzeCode = async () => {
-    if (!code) return;
+  if (!code) return;
 
-    setLoading(true);
-    setResult("");
+  setLoading(true);
+  setResult("");
 
-    try {
-      const res = await fetch("https://ai-code-reviewer-ueve.onrender.com", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ code }),
-      });
+  try {
+    const res = await fetch("https://ai-code-reviewer-ueve.onrender.com/review", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ code }),
+    });
 
-      const data = await res.json();
+    const data = await res.json();
+
+    console.log("API RESPONSE:", data); 
+
+    if (data.result) {
       setResult(data.result);
-    } catch {
-      setResult("Server error");
+    } else {
+      setResult("No response from AI ❌");
     }
 
-    setLoading(false);
-  };
+  } catch (err) {
+    console.log("FRONTEND ERROR:", err);
+    setResult("Error connecting to server ❌");
+  }
+
+  setLoading(false);
+};
 
   return (
     <div className="container">
